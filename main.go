@@ -11,22 +11,24 @@ import (
 type myMessage string
 
 func main() {
-
 	var b broker.Broker
 
 	// Trying the in-memory broker.
 	b = broker.NewMemoryBroker()
 	// b = broker.NewRedisBroker()
 
+	// subCh is a readony channel that we will
+	// receive messages published on "ch1".
 	subCh, err := b.Subscribe("ch1")
 	if err != nil {
 		log.Fatalln(err)
 	}
 
+	// start a publish loop
+	// publish a message every second.
 	go func() {
 		defer b.Close()
 
-		// pubish a message every second.
 		i := 0
 		for {
 			i++
@@ -45,6 +47,7 @@ func main() {
 		}
 	}()
 
+	// read messages from subCh published on "ch1".
 	for m := range subCh {
 		fmt.Printf("got message: %s\n", m)
 	}
